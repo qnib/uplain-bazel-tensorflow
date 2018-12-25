@@ -26,7 +26,7 @@ RUN apt-get update \
  && apt-get install --no-install-recommends -y vim \
  && rm -rf /var/lib/apt/lists/*
 RUN apt-get update \
- && apt-get install --no-install-recommends -y python-setuptools python3-setuptools python3-pip libceres-dev  libc-ares-dev python3-pycares \
+ && apt-get install --no-install-recommends -y python-setuptools python3-setuptools python3-pip libceres-dev  libc-ares-dev python3-pycares python3-wheel \
  && rm -rf /var/lib/apt/lists/* \
  && pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 RUN apt-get update \
@@ -38,8 +38,9 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 COPY bazelrc/v${TF_VER} /opt/tensorflow/.bazelrc
 RUN bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 --config=opt --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
-RUN ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/
-RUN pip3 install /opt/tensorflow-${TF_VER}-cp36-cp36m-linux_x86_64.whl
+RUN mkdir -p /opt/wheel \
+ && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
+RUN pip3 install $(find /opt/wheel -name "*.whl")
 #RUN bazel fetch \
 #            --incompatible_remove_native_http_archive=false \
 #            --incompatible_package_name_is_a_function=false \
