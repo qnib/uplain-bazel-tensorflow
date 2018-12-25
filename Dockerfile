@@ -26,7 +26,7 @@ RUN apt-get update \
 RUN apt-get update \
  && apt-get install --no-install-recommends -y python-setuptools python3-setuptools python3-pip libceres-dev  libc-ares-dev python3-pycares \
  && rm -rf /var/lib/apt/lists/* \
- && pip3 install keras_applications==1.0.4 keras_preprocessing==1.0.2
+ && pip3 install wheel=0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 RUN apt-get update \
  && apt-get install  -y python3-numpy python3-dev libpython3-dev \
  && rm -rf /var/lib/apt/lists/*
@@ -34,7 +34,7 @@ COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 RUN apt-get update \
  && apt-get install  -y python-numpy python-dev libpython-dev \
  && rm -rf /var/lib/apt/lists/*
-COPY bazelrc/v${TF_VER} /opt/tensorflow/.tf_configure.bazelrc
+COPY bazelrc/v${TF_VER} /opt/tensorflow/.bazelrc
 RUN bazel build --config=opt --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/
 RUN pip3 install /opt/tensorflow-${TF_VER}-cp36-cp36m-linux_x86_64.whl
