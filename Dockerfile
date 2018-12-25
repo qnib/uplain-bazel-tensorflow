@@ -21,6 +21,9 @@ ARG TF_VER=1.12.0
 
 WORKDIR /opt/tensorflow
 RUN apt-get update \
+ && apt-get install --no-install-recommends -y vim \
+ && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
  && apt-get install --no-install-recommends -y python-setuptools python3-setuptools python3-pip libceres-dev  libc-ares-dev python3-pycares \
  && rm -rf /var/lib/apt/lists/* \
  && pip3 install keras_applications==1.0.4 keras_preprocessing==1.0.2
@@ -32,8 +35,7 @@ RUN apt-get update \
  && apt-get install  -y python-numpy python-dev libpython-dev \
  && rm -rf /var/lib/apt/lists/*
 COPY bazelrc/v${TF_VER} /opt/tensorflow/.tf_configure.bazelrc
-RUN exit 1
-RUN bazel build --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
+RUN bazel build --config=opt --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/
 RUN pip3 install /opt/tensorflow-${TF_VER}-cp36-cp36m-linux_x86_64.whl
 #RUN bazel fetch \
