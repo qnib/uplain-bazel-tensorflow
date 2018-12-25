@@ -18,6 +18,8 @@ FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKE
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBCONF_NONINTERACTIVE_SEEN=true
 ARG TF_VER=1.12.0
+ARG BAZEL_OPT_MARCH="sandybridge"
+ARG BAZEL_OPT_MTUNE="broadwell"
 
 WORKDIR /opt/tensorflow
 RUN apt-get update \
@@ -35,7 +37,7 @@ RUN apt-get update \
  && apt-get install  -y python-numpy python-dev libpython-dev \
  && rm -rf /var/lib/apt/lists/*
 COPY bazelrc/v${TF_VER} /opt/tensorflow/.bazelrc
-RUN bazel build --config=opt --copt="-mtune=generic" --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
+RUN bazel build --config=opt --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/
 RUN pip3 install /opt/tensorflow-${TF_VER}-cp36-cp36m-linux_x86_64.whl
 #RUN bazel fetch \
