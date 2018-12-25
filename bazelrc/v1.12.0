@@ -19,3 +19,8 @@ build:opt --host_copt=-march=native
 build:opt --define with_default_optimizations=true
 build:v2 --define=tf_api_version=2
 build --define=grpc_no_ares=true
+build --define=no_aws_support=true
+build --define=no_gcp_support=true
+build --define=no_hdfs_support=true
+build --define=no_ignite_support=true
+build --define=no_kafka_support=true
