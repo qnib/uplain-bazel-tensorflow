@@ -18,3 +18,4 @@ build:opt --copt=-march=native
 build:opt --host_copt=-march=native
 build:opt --define with_default_optimizations=true
 build:v2 --define=tf_api_version=2
+build --define=grpc_no_ares=true
