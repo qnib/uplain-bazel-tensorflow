@@ -28,7 +28,7 @@ RUN apt-get update \
 RUN apt-get update \
  && apt-get install --no-install-recommends -y python-setuptools python3-setuptools python3-pip libceres-dev  libc-ares-dev python3-pycares \
  && rm -rf /var/lib/apt/lists/* \
- && pip3 install wheel=0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
+ && pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 RUN apt-get update \
  && apt-get install  -y python3-numpy python3-dev libpython3-dev \
  && rm -rf /var/lib/apt/lists/*
