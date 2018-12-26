@@ -6,18 +6,19 @@ ARG FROM_IMG_HASH=""
 
 ## git clone within external image
 FROM alpine AS tfdown
-ARG TF_VER=v1.12.0
+ARG TF_VER=1.12.0
+ARG TF_CHECKOUT=v
 RUN apk --update add git
 RUN git clone https://github.com/tensorflow/tensorflow /opt/tensorflow
 WORKDIR /opt/tensorflow
-RUN git checkout -b ${TF_VER} ${TF_VER}
+RUN git checkout -b ${TF_VER} ${TF_CHECKOUT}${TF_VER}
 ##END git clone within external image
 
 FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
 
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBCONF_NONINTERACTIVE_SEEN=true
-ARG TF_VER=1.12.0
+ARG TF_VER=1.13.0
 ARG BAZEL_OPT_MARCH="native"
 ARG BAZEL_OPT_MTUNE="native"
 ARG BAZEL_OPTIMIZE="0"
