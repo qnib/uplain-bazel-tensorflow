@@ -38,6 +38,9 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 COPY bazelrc/v${TF_VER} /opt/tensorflow/.bazelrc
 RUN bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 --config=opt --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y python-wheel \
+ && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
 RUN pip3 install $(find /opt/wheel -name "*.whl")
