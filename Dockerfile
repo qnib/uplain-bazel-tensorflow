@@ -11,7 +11,7 @@ ARG TF_CHECKOUT=v
 RUN apk --update add git
 RUN git clone https://github.com/tensorflow/tensorflow /opt/tensorflow
 WORKDIR /opt/tensorflow
-RUN git checkout -b ${TF_VER} ${TF_CHECKOUT}${TF_VER}
+RUN git checkout ${TF_CHECKOUT}${TF_VER}
 ##END git clone within external image
 
 FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
