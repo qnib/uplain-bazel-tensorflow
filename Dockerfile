@@ -18,10 +18,10 @@ FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKE
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBCONF_NONINTERACTIVE_SEEN=true
 ARG TF_VER=1.12.0
-ARG BAZEL_OPT_MARCH="sandybridge"
-ARG BAZEL_OPT_MTUNE="broadwell"
+ARG BAZEL_OPT_MARCH="native"
+ARG BAZEL_OPT_MTUNE="native"
 ARG BAZEL_OPTIMIZE="0"
-ARG D_GLIBCXX_USE_CXX11_ABI="0"
+ARG D_GLIBCXX_USE_CXX11_ABI="1"
 
 WORKDIR /opt/tensorflow
 RUN apt-get update \
@@ -30,7 +30,10 @@ RUN apt-get update \
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 COPY bazelrc/v${TF_VER} /opt/tensorflow/.bazelrc
-RUN bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
+RUN echo """bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}'"""  \
+ && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}'""" \
+ && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
+ && bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
                 --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
@@ -38,3 +41,4 @@ RUN mkdir -p /opt/wheel \
 RUN pip3 install $(find /opt/wheel -name "*.whl")
 WORKDIR /
 RUN python -c 'import tensorflow as tf;hello = tf.constant("Hello, TensorFlow!");sess = tf.Session();print(sess.run(hello))'
+RUN echo "python -c 'from tensorflow.python.client import device_lib;device_lib.list_local_devices()'" >> /root/.bash_history
