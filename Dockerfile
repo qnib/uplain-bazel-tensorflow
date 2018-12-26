@@ -35,4 +35,6 @@ RUN bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
-RUN pip3 install /opt/wheel/$(find /opt/wheel -name "*.whl")
+RUN pip3 install $(find /opt/wheel -name "*.whl")
+WORKDIR /
+RUN python -c 'import tensorflow as tf;hello = tf.constant("Hello, TensorFlow!");sess = tf.Session();print(sess.run(hello))'
