@@ -33,8 +33,8 @@ COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 ARG TF_CHECKOUT=v
 ARG TF_EXTRA=""
 COPY bazelrc/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.bazelrc
-RUN echo """bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}'"""  \
- && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}'""" \
+RUN echo """bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \ """  \
+ && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \ """ \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
  && bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
                 --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --copt="-O${BAZEL_OPTIMIZE}" \
