@@ -43,5 +43,6 @@ RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
 RUN pip3 install $(find /opt/wheel -name "*.whl")
 WORKDIR /
+RUN pip3 install --upgrade numpy
 RUN python -c 'import tensorflow as tf;hello = tf.constant("Hello, TensorFlow!");sess = tf.Session();print(sess.run(hello))'
 RUN echo "python -c 'from tensorflow.python.client import device_lib;device_lib.list_local_devices()'" >> /root/.bash_history
