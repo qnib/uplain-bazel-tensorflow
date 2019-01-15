@@ -42,7 +42,7 @@ ENV BAZEL_OPT_MARCH="native" \
 RUN echo """bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \ """  \
  && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \ """ \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package \\""" \
- && echo """            --define grpc_no_ares=true --define with_jemalloc=true --python_path=/usr/bin/python"""
+ && echo """            --define grpc_no_ares=true --define with_jemalloc=true --python_path=/usr/bin/python""" \
  && bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
                 --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package \
