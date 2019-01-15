@@ -32,18 +32,18 @@ ENV BAZEL_OPT_MARCH="native" \
     CUDA_TOOLKIT_PATH="/usr/local/cuda" \
     TF_CUDA_VERSION="9.2" \
     CUDNN_INSTALL_PATH="/usr/local/cuda-9.2" \
-    TF_CUDNN_VERSION="7.1" \
+    TF_CUDNN_VERSION="7.4.1" \
     TF_NCCL_VERSION="1" \
     TF_CUDA_COMPUTE_CAPABILITIES="3.7" \
     TF_CUDA_CLANG="0" \
     GCC_HOST_COMPILER_PATH="/usr/bin/gcc" \
     PYTHON_BIN_PATH="/usr/bin/python" \
     PYTHON_LIB_PATH="/usr/local/lib/python3.6/dist-packages"
-RUN echo """bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \ """  \
+RUN echo """bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \ """  \
  && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \ """ \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package \\""" \
  && echo """            --define grpc_no_ares=true --define with_jemalloc=true --python_path=/usr/bin/python""" \
- && bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
+ && bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
                 --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package \
                 --define grpc_no_ares=true --define with_jemalloc=true --python_path=/usr/bin/python
@@ -53,3 +53,4 @@ RUN pip3 install $(find /opt/wheel -name "*.whl")
 WORKDIR /
 RUN python -c 'import tensorflow as tf;hello = tf.constant("Hello, TensorFlow!");sess = tf.Session();print(sess.run(hello))'
 RUN echo "python -c 'from tensorflow.python.client import device_lib;device_lib.list_local_devices()'" >> /root/.bash_history
+RUN echo "python -c 'from keras import backend as K;print(K.tensorflow_backend._get_available_gpus())'" >> /root/.bash_history
