@@ -39,8 +39,8 @@ ENV BAZEL_OPT_MARCH="native" \
     GCC_HOST_COMPILER_PATH="/usr/bin/gcc" \
     PYTHON_BIN_PATH="/usr/bin/python" \
     PYTHON_LIB_PATH="/usr/local/lib/python3.6/dist-packages"
-RUN echo """bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \ """  \
- && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \ """ \
+RUN echo """bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
+ && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package \\""" \
  && echo """            --define grpc_no_ares=true --define with_jemalloc=true --python_path=/usr/bin/python""" \
  && bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \

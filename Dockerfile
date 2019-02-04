@@ -4,6 +4,15 @@ ARG FROM_IMG_NAME=uplain-bazel
 ARG FROM_IMG_TAG=2018-12-23.1
 ARG FROM_IMG_HASH=""
 
+### Create nccl deb
+FROM qnib/uplain-init:bionic AS nccl
+RUN apt update \
+ && apt install -y build-essential devscripts debhelper git
+WORKDIR /usr/local/src
+RUN git clone https://github.com/nvidia/nccl
+WORKDIR /usr/local/src/nccl
+RUN make pkg.debian.build
+
 ## git clone within external image
 FROM alpine AS tfdown
 ARG TF_VER=1.12.0
@@ -15,6 +24,9 @@ RUN git checkout ${TF_CHECKOUT}${TF_VER}
 ##END git clone within external image
 
 FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
+
+COPY --from=nccl /usr/local/src/nccl/build/pkg/deb/ /usr/local/deb/
+RUN dpkg -i /usr/local/deb/*
 
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBCONF_NONINTERACTIVE_SEEN=true
@@ -33,8 +45,8 @@ COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 ARG TF_CHECKOUT=v
 ARG TF_EXTRA=""
 COPY bazelrc/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.bazelrc
-RUN echo """bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \ """  \
- && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \ """ \
+RUN echo """bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
+ && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
  && bazel build --config=opt --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
                 --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --copt="-O${BAZEL_OPTIMIZE}" \
