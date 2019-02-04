@@ -5,7 +5,7 @@ ARG FROM_IMG_TAG=2018-12-23.1
 ARG FROM_IMG_HASH=""
 
 ### Create nccl deb
-FROM qnib/uplain-init:bionic AS nccl
+FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH} AS nccl
 RUN apt update \
  && apt install -y build-essential devscripts debhelper git
 WORKDIR /usr/local/src
