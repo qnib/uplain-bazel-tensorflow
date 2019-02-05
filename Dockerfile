@@ -5,8 +5,8 @@ ARG FROM_IMG_TAG=2018-12-23.1
 ARG FROM_IMG_HASH=""
 ARG TF_CUDA_COMPUTE_CAPABILITIES="3.7,5.2.7.0"
 ARG NCCL_INSTALL_PATH=/usr/include
-ARG TF_VER=1.12.0
-ARG TF_CHECKOUT=v
+ARG TF_VER=master
+ARG TF_CHECKOUT=
 ARG TF_EXTRA
 ARG BAZEL_OPT_MARCH="native"
 ARG BAZEL_OPT_MTUNE="native"
@@ -20,7 +20,7 @@ ARG TF_CHECKOUT
 RUN apk --update add git
 RUN git clone https://github.com/tensorflow/tensorflow /opt/tensorflow
 WORKDIR /opt/tensorflow
-RUN git checkout ${TF_CHECKOUT}${TF_VER}
+RUN if [[ "X${TF_VER}" != "Xmaster" ]];then ; git checkout ${TF_CHECKOUT}${TF_VER} ;done
 ##END git clone within external image
 
 FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
@@ -43,11 +43,14 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
-COPY bazelrc/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.tf_configure.bazelrc
-RUN echo """bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
+COPY tfconfig/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.tf_configure.bazelrc
+COPY bazelrc/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.bazelrc
+RUN echo """bazel build --config=opt --config=cuda \\""" \
+ && echo """            --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
  && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
- && bazel build --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
+ && bazel build --config=opt --config=cuda \
+                --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
                 --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
