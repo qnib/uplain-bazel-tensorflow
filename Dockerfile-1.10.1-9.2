@@ -4,6 +4,7 @@ ARG FROM_IMG_NAME=uplain-bazel
 ARG FROM_IMG_TAG=2018-12-23.1
 ARG FROM_IMG_HASH=""
 ARG BUILD_THREADS=2
+ARG NCCL_INSTALL_PATH=/usr/include
 
 ## git clone within external image
 FROM alpine AS tfdown
@@ -23,6 +24,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 WORKDIR /opt/tensorflow
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2 numpy==1.16.0
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
+ARG NCCL_INSTALL_PATH
 ENV BAZEL_OPT_MARCH="native" \
     BAZEL_OPT_MTUNE="native" \
     BAZEL_OPTIMIZE="0" \
