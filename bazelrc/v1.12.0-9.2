@@ -15,8 +15,6 @@ build --action_env NCCL_HDR_PATH="/usr/include"
 build --action_env TF_NCCL_VERSION="2"
 build --action_env TF_CUDA_CLANG="0"
 build --action_env GCC_HOST_COMPILER_PATH="/usr/bin/gcc"
-build --config=cuda
-test --config=cuda
 build:opt --copt=-march=native
 build:opt --host_copt=-march=native
 build:opt --define with_default_optimizations=true
