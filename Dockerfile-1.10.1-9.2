@@ -5,7 +5,7 @@ ARG FROM_IMG_TAG=2018-12-23.1
 ARG FROM_IMG_HASH=""
 ARG BUILD_THREADS=2
 ARG NCCL_INSTALL_PATH=/usr/include
-
+ARG TF_CUDA_COMPUTE_CAPABILITIES="3.7,5.2.7.0"
 ## git clone within external image
 FROM alpine AS tfdown
 ARG TF_VER=1.10.1
@@ -25,6 +25,7 @@ WORKDIR /opt/tensorflow
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2 numpy==1.16.0
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 ARG NCCL_INSTALL_PATH
+ARG TF_CUDA_COMPUTE_CAPABILITIES
 ENV BAZEL_OPT_MARCH="native" \
     BAZEL_OPT_MTUNE="native" \
     BAZEL_OPTIMIZE="0" \
@@ -36,7 +37,7 @@ ENV BAZEL_OPT_MARCH="native" \
     CUDNN_INSTALL_PATH="/usr/local/cuda-9.2" \
     TF_CUDNN_VERSION="7.4.1" \
     TF_NCCL_VERSION="2.4.2" \
-    TF_CUDA_COMPUTE_CAPABILITIES="3.7" \
+    TF_CUDA_COMPUTE_CAPABILITIES=${TF_CUDA_COMPUTE_CAPABILITIES} \
     TF_CUDA_CLANG="0" \
     GCC_HOST_COMPILER_PATH="/usr/bin/gcc" \
     PYTHON_BIN_PATH="/usr/bin/python" \
