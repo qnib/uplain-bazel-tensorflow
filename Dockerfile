@@ -23,6 +23,7 @@ ARG BAZEL_OPT_MARCH="native"
 ARG BAZEL_OPT_MTUNE="native"
 ARG BAZEL_OPTIMIZE="0"
 ARG D_GLIBCXX_USE_CXX11_ABI="0"
+ARG NCCL_INSTALL_PATH=/usr/include
 
 WORKDIR /opt/tensorflow
 RUN apt-get update \
