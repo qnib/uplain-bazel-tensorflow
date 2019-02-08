@@ -43,7 +43,7 @@ ENV TF_CUDA_COMPUTE_CAPABILITIES=${TF_CUDA_COMPUTE_CAPABILITIES}
 ENV D_GLIBCXX_USE_CXX11_ABI=${D_GLIBCXX_USE_CXX11_ABI}
 WORKDIR /opt/tensorflow
 RUN apt-get update \
- && apt-get install --no-install-recommends -y vim python-numpy git gpg-agent \
+ && apt-get install --no-install-recommends -y vim python-numpy git \
  && rm -rf /var/lib/apt/lists/*
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
