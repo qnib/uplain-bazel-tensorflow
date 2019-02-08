@@ -3,7 +3,9 @@ ARG FROM_IMG_REPO=qnib
 ARG FROM_IMG_NAME=uplain-bazel
 ARG FROM_IMG_TAG=2018-12-23.1
 ARG FROM_IMG_HASH=""
-ARG TF_CUDA_COMPUTE_CAPABILITIES="3.7,5.2.7.0"
+# inherit this from cuda-dev so that it is consistent?
+# -> or define in the same way so that the CI/CD can keep it consistent
+ARG TF_CUDA_COMPUTE_CAPABILITIES="7.0"
 ARG NCCL_INSTALL_PATH=/usr/include
 ARG TF_VER=master
 ARG TF_CHECKOUT=
@@ -12,7 +14,6 @@ ARG BAZEL_OPT_MARCH="native"
 ARG BAZEL_OPT_MTUNE="native"
 ARG BAZEL_OPTIMIZE="0"
 ARG D_GLIBCXX_USE_CXX11_ABI="0"
-
 ## git clone within external image
 FROM alpine AS tfdown
 ARG TF_VER
@@ -37,10 +38,12 @@ ARG D_GLIBCXX_USE_CXX11_ABI
 ARG NCCL_INSTALL_PATH
 ARG TF_CUDA_COMPUTE_CAPABILITIES
 ENV BAZEL_OPT_MARCH=${BAZEL_OPT_MARCH}
-
+ENV NCCL_INSTALL_PATH=${NCCL_INSTALL_PATH}
+ENV TF_CUDA_COMPUTE_CAPABILITIES=${TF_CUDA_COMPUTE_CAPABILITIES}
+ENV D_GLIBCXX_USE_CXX11_ABI=${D_GLIBCXX_USE_CXX11_ABI}
 WORKDIR /opt/tensorflow
 RUN apt-get update \
- && apt-get install --no-install-recommends -y vim python-numpy \
+ && apt-get install --no-install-recommends -y vim python-numpy git \
  && rm -rf /var/lib/apt/lists/*
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
