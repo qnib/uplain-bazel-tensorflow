@@ -7,7 +7,7 @@ ARG FROM_IMG_HASH=""
 # -> or define in the same way so that the CI/CD can keep it consistent
 ARG TF_CUDA_COMPUTE_CAPABILITIES="7.0"
 ARG NCCL_INSTALL_PATH=/usr/include
-ARG TF_VER=master
+ARG TF_VER=1.12.0
 ARG TF_CHECKOUT=
 ARG TF_EXTRA
 ARG BAZEL_OPT_MARCH="native"
