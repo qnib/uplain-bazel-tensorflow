@@ -18,6 +18,7 @@ ARG D_GLIBCXX_USE_CXX11_ABI="0"
 FROM alpine AS tfdown
 ARG TF_VER
 ARG TF_CHECKOUT
+ARG TF_EXTRA
 RUN apk --update add git
 RUN git clone https://github.com/tensorflow/tensorflow /opt/tensorflow
 WORKDIR /opt/tensorflow
