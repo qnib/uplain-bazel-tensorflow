@@ -7,31 +7,32 @@ ARG FROM_IMG_HASH=""
 # -> or define in the same way so that the CI/CD can keep it consistent
 ARG TF_CUDA_COMPUTE_CAPABILITIES="7.0"
 ARG NCCL_INSTALL_PATH=/usr/include
-ARG TF_VER=1.12.0
-ARG TF_CHECKOUT=v
-ARG TF_EXTRA
+ARG TF_GIT_VER=1.12.0
+ARG TF_GIT_CHECKOUT=v
+ARG TF_GIT_EXTRA
+ARG TF_CUDA_VER
 ARG BAZEL_OPT_MARCH="native"
 ARG BAZEL_OPT_MTUNE="native"
 ARG BAZEL_OPTIMIZE="0"
 ARG D_GLIBCXX_USE_CXX11_ABI="0"
 ## git clone within external image
 FROM alpine AS tfdown
-ARG TF_VER
-ARG TF_CHECKOUT
-ARG TF_EXTRA
+ARG TF_GIT_VER
+ARG TF_GIT_CHECKOUT
+ARG TF_GIT_EXTRA
 RUN apk --update add git
 RUN git clone https://github.com/tensorflow/tensorflow /opt/tensorflow
 WORKDIR /opt/tensorflow
-RUN if [[ "X${TF_VER}" != "Xmaster" ]];then git checkout ${TF_CHECKOUT}${TF_VER}${TF_EXTRA} ;fi
+RUN if [[ "X${TF_GIT_VER}" != "Xmaster" ]];then git checkout ${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_GIT_EXTRA} ;fi
 ##END git clone within external image
 
 FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
 
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBCONF_NONINTERACTIVE_SEEN=true
-ARG TF_VER
-ARG TF_CHECKOUT
-ARG TF_EXTRA
+ARG TF_GIT_VER
+ARG TF_GIT_CHECKOUT
+ARG TF_CUDA_VER
 ARG BAZEL_OPT_MARCH
 ARG BAZEL_OPT_MTUNE
 ARG BAZEL_OPTIMIZE
@@ -48,8 +49,8 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
-COPY tfconfig/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.tf_configure.bazelrc
-COPY bazelrc/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.bazelrc
+COPY tfconfig/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_CUDA_VER} /opt/tensorflow/.tf_configure.bazelrc
+COPY bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_CUDA_VER} /opt/tensorflow/.bazelrc
 RUN echo """bazel build --config=opt --config=cuda \\""" \
  && echo """            --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
  && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
