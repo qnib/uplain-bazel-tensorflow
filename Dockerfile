@@ -10,8 +10,7 @@ ARG NCCL_INSTALL_PATH=/usr/include
 ARG TF_VER=1.12.0
 ARG TF_CHECKOUT=v
 ARG TF_EXTRA
-ARG BAZEL_OPT_MARCH="native"
-ARG BAZEL_OPT_MTUNE="native"
+ARG BAZEL_OPT_MARCH="broadwell"
 ARG BAZEL_OPTIMIZE="0"
 ARG D_GLIBCXX_USE_CXX11_ABI="0"
 ## git clone within external image
@@ -33,7 +32,6 @@ ARG TF_VER
 ARG TF_CHECKOUT
 ARG TF_EXTRA
 ARG BAZEL_OPT_MARCH
-ARG BAZEL_OPT_MTUNE
 ARG BAZEL_OPTIMIZE
 ARG D_GLIBCXX_USE_CXX11_ABI
 ARG NCCL_INSTALL_PATH
@@ -49,14 +47,14 @@ RUN apt-get update \
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 COPY tfconfig/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.tf_configure.bazelrc
-COPY bazelrc/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.bazelrc
+COPY bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER} /opt/tensorflow/.bazelrc
 RUN echo """bazel build --config=opt \\""" \
  && echo """            --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
- && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
+ && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
  && bazel build --config=opt \
                 --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
-                --copt="-march=${BAZEL_OPT_MARCH}" --copt="-mtune=${BAZEL_OPT_MTUNE}" --copt="-O${BAZEL_OPTIMIZE}" \
+                --copt="-march=${BAZEL_OPT_MARCH}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
