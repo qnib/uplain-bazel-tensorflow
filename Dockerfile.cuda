@@ -50,7 +50,7 @@ RUN apt-get update \
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 COPY tfconfig/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_CUDA_VER} /opt/tensorflow/.tf_configure.bazelrc
-COPY bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_CUDA_VER} /opt/tensorflow/.bazelrc
+COPY bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER} /opt/tensorflow/.bazelrc
 RUN echo """bazel build --config=opt --config=cuda \\""" \
  && echo """            --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
  && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-mtune=${BAZEL_OPT_MTUNE}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
