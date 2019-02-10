@@ -22,7 +22,7 @@ ARG TF_EXTRA
 RUN apk --update add git
 RUN git clone https://github.com/tensorflow/tensorflow /opt/tensorflow
 WORKDIR /opt/tensorflow
-RUN if [[ "X${TF_VER}" != "Xmaster" ]];then git checkout ${TF_CHECKOUT}${TF_VER}${TF_EXTRA ;fi
+RUN if [[ "X${TF_VER}" != "Xmaster" ]];then git checkout ${TF_CHECKOUT}${TF_VER}${TF_EXTRA} ;fi
 ##END git clone within external image
 
 FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
