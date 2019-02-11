@@ -46,7 +46,9 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 RUN pip3 install wheel==0.32.3 keras_applications==1.0.4 keras_preprocessing==1.0.2
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
-COPY tfconfig/${TF_CHECKOUT}${TF_VER}${TF_EXTRA} /opt/tensorflow/.tf_configure.bazelrc
+RUN echo "cp tfconfig/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_EXTRA} /opt/tensorflow/.tf_configure.bazelrc" \
+  && echo "cp bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER} /opt/tensorflow/.bazelrc"
+COPY tfconfig/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_EXTRA} /opt/tensorflow/.tf_configure.bazelrc
 COPY bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER} /opt/tensorflow/.bazelrc
 RUN echo """bazel build --config=opt \\""" \
  && echo """            --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
