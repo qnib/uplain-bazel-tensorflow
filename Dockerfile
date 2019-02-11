@@ -10,7 +10,7 @@ ARG NCCL_INSTALL_PATH=/usr/include
 ARG TF_VER=1.12.0
 ARG TF_CHECKOUT=v
 ARG TF_EXTRA
-ARG BAZEL_OPT_MARCH="broadwell"
+ARG CFLAG_MARCH="x86-64"
 ARG BAZEL_OPTIMIZE="0"
 ARG D_GLIBCXX_USE_CXX11_ABI="0"
 ## git clone within external image
@@ -31,7 +31,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 ARG TF_VER
 ARG TF_CHECKOUT
 ARG TF_EXTRA
-ARG BAZEL_OPT_MARCH
+ARG CFLAG_MARCH
 ARG BAZEL_OPTIMIZE
 ARG D_GLIBCXX_USE_CXX11_ABI
 ARG NCCL_INSTALL_PATH
@@ -52,11 +52,11 @@ COPY tfconfig/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_EXTRA} /opt/tensorflow/.tf_con
 COPY bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER} /opt/tensorflow/.bazelrc
 RUN echo """bazel build --config=opt \\""" \
  && echo """            --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
- && echo """            --copt='-march=${BAZEL_OPT_MARCH}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
+ && echo """            --copt='-march=${CFLAG_MARCH}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
  && bazel build --config=opt \
                 --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
-                --copt="-march=${BAZEL_OPT_MARCH}" --copt="-O${BAZEL_OPTIMIZE}" \
+                --copt="-march=${CFLAG_MARCH}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
