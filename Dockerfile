@@ -38,7 +38,7 @@ WORKDIR /opt/tensorflow
 RUN apt-get update \
  && apt-get install --no-install-recommends -y vim python-numpy git \
  && rm -rf /var/lib/apt/lists/*
-RUN pip3 install wheel==0.32.3
+RUN pip3 install wheel==0.32.3 keras_applications==1.0.7 keras_preprocessing==1.0.9
 COPY --from=tfdown /opt/tensorflow /opt/tensorflow
 RUN echo "cp tfconfig/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_GIT_EXTRA} /opt/tensorflow/.tf_configure.bazelrc" \
   && echo "cp bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER} /opt/tensorflow/.bazelrc"
