@@ -7,9 +7,9 @@ build --action_env TF_NEED_OPENCL_SYCL="0"
 build --action_env TF_NEED_ROCM="0"
 build --action_env TF_NEED_CUDA="0"
 build --action_env GCC_HOST_COMPILER_PATH="/usr/bin/gcc"
-build:opt --copt=-march=native
+build:opt --copt=-march=x86-64
 build:opt --copt=-Wno-sign-compare
-build:opt --host_copt=-march=native
+build:opt --host_copt=-march=x86-64
 build:opt --define with_default_optimizations=true
 build:v2 --define=tf_api_version=2
 build --define=grpc_no_ares=true
