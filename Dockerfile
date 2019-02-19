@@ -21,7 +21,7 @@ WORKDIR /opt/tensorflow
 RUN if [[ "X${TF_VER}" != "Xmaster" ]];then git checkout ${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_GIT_EXTRA} ;fi
 ##END git clone within external image
 
-FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
+FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH} AS build
 
 ENV DEBIAN_FRONTEND=noninteractive \
     DEBCONF_NONINTERACTIVE_SEEN=true
@@ -54,6 +54,16 @@ RUN echo """bazel build --config=opt \\""" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
+RUN pip3 install $(find /opt/wheel -name "*.whl")
+WORKDIR /
+RUN python -c 'import tensorflow as tf;hello = tf.constant("Hello, TensorFlow!");sess = tf.Session();print(sess.run(hello))'
+RUN echo "python -c 'from tensorflow.python.client import device_lib;device_lib.list_local_devices()'" >> /root/.bash_history
+RUN echo "python -c 'from keras import backend as K;print(K.tensorflow_backend._get_available_gpus())'" >> /root/.bash_history
+COPY entry.sh /usr/local/bin/
+CMD ["/usr/local/bin/entry.sh"]
+
+FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
+COPY --from=build /opt/wheel /opt/wheel
 RUN pip3 install $(find /opt/wheel -name "*.whl")
 WORKDIR /
 RUN python -c 'import tensorflow as tf;hello = tf.constant("Hello, TensorFlow!");sess = tf.Session();print(sess.run(hello))'
