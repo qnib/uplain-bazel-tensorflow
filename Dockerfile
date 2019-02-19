@@ -64,7 +64,7 @@ CMD ["/usr/local/bin/entry.sh"]
 
 FROM ${DOCKER_REGISTRY}/${FROM_IMG_REPO}/${FROM_IMG_NAME}:${FROM_IMG_TAG}${DOCKER_IMG_HASH}
 COPY --from=build /opt/wheel /opt/wheel
-RUN pip3 install $(find /opt/wheel -name "*.whl")
+RUN pip3 install keras==2.2.4 $(find /opt/wheel -name "*.whl")
 WORKDIR /
 RUN python -c 'import tensorflow as tf;hello = tf.constant("Hello, TensorFlow!");sess = tf.Session();print(sess.run(hello))'
 RUN echo "python -c 'from tensorflow.python.client import device_lib;device_lib.list_local_devices()'" >> /root/.bash_history
