@@ -53,11 +53,11 @@ COPY tfconfig/${TF_GIT_CHECKOUT}${TF_GIT_VER}${TF_CUDA_VER} /opt/tensorflow/.tf_
 COPY bazelrc/${TF_GIT_CHECKOUT}${TF_GIT_VER} /opt/tensorflow/.bazelrc
 RUN echo """bazel build --config=opt --config=cuda \\""" \
  && echo """            --cxxopt=-D_GLIBCXX_USE_CXX11_ABI='${D_GLIBCXX_USE_CXX11_ABI}' \\"""  \
- && echo """            --copt='-march=${CFLAG_MARCH} ${COPTS_EXTRA}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
+ && echo """            --copt='-march=${CFLAG_MARCH}' --copt='-O${BAZEL_OPTIMIZE}' \\""" \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
  && bazel build --config=opt --config=cuda \
                 --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
-                --copt="-march=${CFLAG_MARCH} ${COPTS_EXTRA}" --copt="-O${BAZEL_OPTIMIZE}" \
+                --copt="-march=${CFLAG_MARCH}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
