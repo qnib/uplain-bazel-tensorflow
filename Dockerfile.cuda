@@ -12,6 +12,7 @@ ARG TF_GIT_CHECKOUT=v
 ARG TF_GIT_EXTRA
 ARG TF_CUDA_VER
 ARG CFLAG_MARCH="x86-64"
+ARG COPTS_EXTRA=""
 ARG BAZEL_OPTIMIZE="0"
 ARG D_GLIBCXX_USE_CXX11_ABI="0"
 ## git clone within external image
@@ -33,6 +34,7 @@ ARG TF_GIT_VER
 ARG TF_GIT_CHECKOUT
 ARG TF_CUDA_VER
 ARG CFLAG_MARCH
+ARG COPTS_EXTRA
 ARG BAZEL_OPTIMIZE
 ARG D_GLIBCXX_USE_CXX11_ABI
 ARG NCCL_INSTALL_PATH
@@ -55,7 +57,7 @@ RUN echo """bazel build --config=opt --config=cuda \\""" \
  && echo """            --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package""" \
  && bazel build --config=opt --config=cuda \
                 --cxxopt=-D_GLIBCXX_USE_CXX11_ABI="${D_GLIBCXX_USE_CXX11_ABI}"  \
-                --copt="-march=${CFLAG_MARCH}" --copt="-O${BAZEL_OPTIMIZE}" \
+                --copt="-march=${CFLAG_MARCH} ${COPTS_EXTRA}" --copt="-O${BAZEL_OPTIMIZE}" \
                 --force_python=PY3 //tensorflow/tools/pip_package:build_pip_package
 RUN mkdir -p /opt/wheel \
  && ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /opt/wheel/
